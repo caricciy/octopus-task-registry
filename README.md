@@ -119,9 +119,49 @@ http://localhost:8080/q/swagger-ui/
 
 The main endpoint for creating a task definition is:
 
-POST /api/v1/tasks
+**POST /api/v1/tasks**
 
-The request body should include all required fields for the task, including name, category, description, status, metadata, httpConfig, and retryPolicy. The response will include the created task definition with all its properties.
+Example request payload:
+
+```json
+{
+  "name": "send-welcome-email",
+  "category": "notifications",
+  "description": "Sends welcome email to newly registered users",
+  "status": "ACTIVE",
+  "metadata": {
+    "priority": "high",
+    "environment": "production",
+    "team": "platform"
+  },
+  "httpConfig": {
+    "endpoint": "https://api.mailservice.com/v1/send",
+    "httpMethod": "POST",
+    "timeoutSeconds": 30,
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer token123",
+      "X-Api-Version": "v1"
+    },
+    "payloadTemplate": {
+      "to": "{{user.email}}",
+      "subject": "Welcome to our platform!",
+      "template": "welcome-email",
+      "variables": {
+        "userName": "{{user.name}}",
+        "activationLink": "{{activation.url}}"
+      }
+    }
+  },
+  "retryPolicy": {
+    "maxAttempts": 3,
+    "backoffSeconds": [5, 15, 60],
+    "retryableStatusCodes": [408, 429, 500, 502, 503, 504]
+  }
+}
+```
+
+The response will include the created task definition with all its properties, including the generated ID and timestamps.
 
 ## Testing
 
