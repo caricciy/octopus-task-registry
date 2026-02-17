@@ -27,6 +27,12 @@ public class TaskDefinitionRestAdapter {
     private final CreateTaskDefinitionUseCase createTaskUseCase;
     private final TaskDefinitionMapstructMapper mapper;
 
+    /**
+     * Endpoint to create a new task definition.
+     *
+     * @param request the request body containing task definition data
+     * @return HTTP 201 Created with the created task definition in the response body.
+     */
     @POST
     public Response createTask(@Valid @NotNull CreateTaskDefinitionCommand request) {
         log.info("REST: Creating task with name: {}, category: {}", request.getName(), request.getCategory());
