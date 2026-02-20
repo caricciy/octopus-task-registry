@@ -4,7 +4,6 @@ import com.octopus.domain.exception.DomainValidationException;
 import com.octopus.domain.vo.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -13,7 +12,6 @@ import java.util.Map;
 import static java.util.Objects.isNull;
 
 @Getter
-@Setter
 @Builder
 public class TaskDefinition {
 
@@ -88,6 +86,71 @@ public class TaskDefinition {
      */
     public void deactivate() {
         this.taskStatus = TaskStatus.INACTIVE;
+        this.audit = this.audit.withUpdatedAt(Instant.now());
+    }
+
+    /**
+     * Activates this task definition.
+     */
+    public void activate() {
+        this.taskStatus = TaskStatus.ACTIVE;
+        this.audit = this.audit.withUpdatedAt(Instant.now());
+    }
+
+    /**
+     * Updates the HTTP configuration.
+     *
+     * @param newHttpConfig the new HTTP configuration
+     */
+    public void updateHttpConfig(HttpConfig newHttpConfig) {
+        if (isNull(newHttpConfig)) throw new DomainValidationException("httpConfig cannot be null");
+
+        this.httpConfig = newHttpConfig;
+        this.audit = this.audit.withUpdatedAt(Instant.now());
+    }
+
+    /**
+     * Updates the retry policy.
+     *
+     * @param newRetryPolicy the new retry policy
+     */
+    public void updateRetryPolicy(RetryPolicy newRetryPolicy) {
+        if (isNull(newRetryPolicy)) throw new DomainValidationException("retryPolicy cannot be null");
+
+        this.retryPolicy = newRetryPolicy;
+        this.audit = this.audit.withUpdatedAt(Instant.now());
+    }
+
+    /**
+     * Updates task metadata.
+     *
+     * @param newMetadata the new metadata map
+     */
+    public void updateMetadata(Map<String, String> newMetadata) {
+        this.metadata = newMetadata != null ? new HashMap<>(newMetadata) : new HashMap<>();
+        this.audit = this.audit.withUpdatedAt(Instant.now());
+    }
+
+    /**
+     * Adds a single metadata entry.
+     *
+     * @param key   the metadata key
+     * @param value the metadata value
+     */
+    public void addMetadata(String key, String value) {
+        if (isNull(key)) throw new DomainValidationException("Metadata key cannot be null");
+
+        this.metadata.put(key, value);
+        this.audit = this.audit.withUpdatedAt(Instant.now());
+    }
+
+    /**
+     * Removes a metadata entry.
+     *
+     * @param key the metadata key to remove
+     */
+    public void removeMetadata(String key) {
+        this.metadata.remove(key);
         this.audit = this.audit.withUpdatedAt(Instant.now());
     }
 
