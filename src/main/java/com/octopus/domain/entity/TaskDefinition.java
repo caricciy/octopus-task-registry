@@ -1,5 +1,6 @@
 package com.octopus.domain.entity;
 
+import com.octopus.domain.exception.DomainValidationException;
 import com.octopus.domain.vo.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Objects.isNull;
 
 @Getter
 @Setter
@@ -37,6 +40,13 @@ public class TaskDefinition {
                           HttpConfig httpConfig,
                           RetryPolicy retryPolicy,
                           Audit audit) {
+        if (isNull(id)) throw new DomainValidationException("id cannot be null");
+        if (isNull(taskInfo)) throw new DomainValidationException("taskInfo cannot be null");
+        if (isNull(status)) throw new DomainValidationException("taskStatus cannot be null");
+        if (isNull(httpConfig)) throw new DomainValidationException("httpConfig cannot be null");
+        if (isNull(retryPolicy)) throw new DomainValidationException("retryPolicy cannot be null");
+        if (isNull(audit)) throw new DomainValidationException("audit cannot be null");
+
         this.id = id;
         this.taskInfo = taskInfo;
         this.taskStatus = status;
@@ -63,6 +73,7 @@ public class TaskDefinition {
             RetryPolicy retryPolicy
     ) {
         return TaskDefinition.builder()
+                .id(TaskDefinitionId.random())
                 .taskInfo(taskInfo)
                 .taskStatus(taskStatus)
                 .metadata(metadata != null ? metadata : new HashMap<>())

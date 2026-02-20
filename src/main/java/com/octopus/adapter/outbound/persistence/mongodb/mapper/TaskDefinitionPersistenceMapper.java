@@ -3,7 +3,6 @@ package com.octopus.adapter.outbound.persistence.mongodb.mapper;
 import com.octopus.adapter.outbound.persistence.mongodb.entity.TaskDefinitionEntity;
 import com.octopus.domain.entity.TaskDefinition;
 import com.octopus.domain.vo.*;
-import org.bson.types.ObjectId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -18,7 +17,7 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 public interface TaskDefinitionPersistenceMapper {
 
     // TaskDefinition to TaskDefinitionEntity
-    @Mapping(target = "id", expression = "java(mapDomainIdToObjectId(domain.getId()))")
+    @Mapping(target = "id", expression = "java(mapDomainIdToString(domain.getId()))")
     @Mapping(target = "name", source = "taskInfo.name")
     @Mapping(target = "category", source = "taskInfo.category")
     @Mapping(target = "description", source = "taskInfo.description")
@@ -29,7 +28,7 @@ public interface TaskDefinitionPersistenceMapper {
     TaskDefinitionEntity toPersistence(TaskDefinition domain);
 
     // TaskDefinitionEntity to TaskDefinition
-    @Mapping(target = "id", expression = "java(mapObjectIdToDomainId(entity.getId()))")
+    @Mapping(target = "id", expression = "java(mapStringToDomainId(entity.getId()))")
     @Mapping(target = "taskInfo", expression = "java(mapToTaskInfo(entity))")
     @Mapping(target = "taskStatus", source = "status")
     @Mapping(target = "httpConfig", source = "httpConfig")
@@ -44,12 +43,12 @@ public interface TaskDefinitionPersistenceMapper {
     @Mapping(target = "payloadTemplate", source = "payloadTemplate")
     TaskDefinitionEntity.HttpConfigEntity toHttpConfigEntity(HttpConfig httpConfig);
 
-    default ObjectId mapDomainIdToObjectId(TaskDefinitionId id) {
-        return id == null ? new ObjectId() : new ObjectId(id.value());
+    default String mapDomainIdToString(TaskDefinitionId id) {
+        return id != null ? id.value().toString() : TaskDefinitionId.random().value().toString();
     }
 
-    default TaskDefinitionId mapObjectIdToDomainId(ObjectId id) {
-        return id != null ? TaskDefinitionId.of(id.toHexString()) : null;
+    default TaskDefinitionId mapStringToDomainId(String id) {
+        return id != null ? TaskDefinitionId.of(id) : null;
     }
 
     default TaskInfo mapToTaskInfo(TaskDefinitionEntity entity) {

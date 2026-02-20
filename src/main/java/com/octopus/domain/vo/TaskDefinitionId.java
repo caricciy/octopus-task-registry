@@ -2,32 +2,34 @@ package com.octopus.domain.vo;
 
 import com.octopus.domain.exception.DomainValidationException;
 
-import java.util.Objects;
+import java.util.UUID;
 
 import static java.util.Objects.isNull;
 
 
-public record TaskDefinitionId(String value) {
+public record TaskDefinitionId(UUID value) {
 
     public TaskDefinitionId {
-        if(isNull(value)) throw new DomainValidationException("value cannot be null");
-        if (value.isBlank()) throw new DomainValidationException("Task ID cannot be null or blank");
+        if(isNull(value)) throw new DomainValidationException("uuid value cannot be null");
+    }
+
+    public static TaskDefinitionId random() {
+        return new TaskDefinitionId(UUID.randomUUID());
     }
 
     public static TaskDefinitionId of(String value) {
+        if (isNull(value)) throw new DomainValidationException("id string value cannot be null");
+
+        try {
+            var uuid = UUID.fromString(value);
+            return new TaskDefinitionId(uuid);
+        } catch (IllegalArgumentException e) {
+            throw new DomainValidationException("id string value must be a valid UUID", e);
+        }
+    }
+
+    public static TaskDefinitionId of(UUID value) {
         return new TaskDefinitionId(value);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TaskDefinitionId(String thatValue))) return false;
-        return Objects.equals(value, thatValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
     }
 }
 

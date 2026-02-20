@@ -1,12 +1,8 @@
 package com.octopus.adapter.outbound.persistence.mongodb.entity;
 
 import io.quarkus.mongodb.panache.common.MongoEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.bson.types.ObjectId;
+import lombok.*;
+import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.time.Instant;
 import java.util.List;
@@ -24,7 +20,8 @@ import java.util.Map;
 @MongoEntity(collection = "task_definitions")
 public class TaskDefinitionEntity {
 
-    private ObjectId id;
+    @BsonId
+    private String id;
     private String name;
     private String category;
     private String description;

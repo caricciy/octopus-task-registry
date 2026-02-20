@@ -2,13 +2,13 @@ package com.octopus.adapter.outbound.persistence.mongodb.repository;
 
 import com.octopus.adapter.outbound.persistence.mongodb.entity.TaskDefinitionEntity;
 import com.octopus.domain.vo.TaskStatus;
-import io.quarkus.mongodb.panache.PanacheMongoRepository;
+import io.quarkus.mongodb.panache.PanacheMongoRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Optional;
 
 @ApplicationScoped
-public class TaskDefinitionMongoRepository implements PanacheMongoRepository<TaskDefinitionEntity> {
+public class TaskDefinitionMongoRepository implements PanacheMongoRepositoryBase<TaskDefinitionEntity, String> {
 
     /**
      * Find a task by name where status is ACTIVE.

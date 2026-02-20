@@ -10,7 +10,6 @@ import com.octopus.domain.vo.TaskDefinitionId;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 
 import java.util.Optional;
 
@@ -26,7 +25,7 @@ public class TaskDefinitionPersistenceAdapter implements LoadTaskDefinitionPort,
     public Optional<TaskDefinition> loadById(TaskDefinitionId id) {
         log.debug("Loading task definition by id: {}", id);
 
-        return repository.findByIdOptional(new ObjectId(id.value()))
+        return repository.findByIdOptional(id.value().toString())
                 .map(mapper::toDomain);
     }
 
