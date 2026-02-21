@@ -13,11 +13,11 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 )
 public interface TaskDefinitionMapstructMapper {
 
-    @Mapping(target = "id", source = "id.value")
-    @Mapping(target = "name", source = "taskInfo.name")
-    @Mapping(target = "category", source = "taskInfo.category")
-    @Mapping(target = "description", source = "taskInfo.description")
-    @Mapping(target = "status", source = "taskStatus")
+    @Mapping(target = "id", expression = "java(domain.id().value().toString())")
+    @Mapping(target = "name", expression = "java(domain.taskInfo().name())")
+    @Mapping(target = "category", expression = "java(domain.taskInfo().category())")
+    @Mapping(target = "description", expression = "java(domain.taskInfo().description())")
+    @Mapping(target = "status", expression = "java(domain.taskStatus().name())")
     CreateTaskDefinitionResponse toResponse(TaskDefinition domain);
 
 }

@@ -46,7 +46,7 @@ public class TaskDefinitionPersistenceAdapter implements LoadTaskDefinitionPort,
 
     @Override
     public TaskDefinition save(TaskDefinition taskDefinition) {
-        log.debug("Saving task definition: {}", taskDefinition.getTaskInfo().name());
+        log.debug("Saving task definition: {}", taskDefinition.taskInfo().name());
 
         TaskDefinitionEntity entity = mapper.toPersistence(taskDefinition);
 

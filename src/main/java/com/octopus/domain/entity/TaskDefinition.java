@@ -3,7 +3,6 @@ package com.octopus.domain.entity;
 import com.octopus.domain.exception.DomainValidationException;
 import com.octopus.domain.vo.*;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
-@Getter
 @Builder
 public class TaskDefinition {
 
@@ -38,20 +36,13 @@ public class TaskDefinition {
                           HttpConfig httpConfig,
                           RetryPolicy retryPolicy,
                           Audit audit) {
-        if (isNull(id)) throw new DomainValidationException("id cannot be null");
-        if (isNull(taskInfo)) throw new DomainValidationException("taskInfo cannot be null");
-        if (isNull(status)) throw new DomainValidationException("taskStatus cannot be null");
-        if (isNull(httpConfig)) throw new DomainValidationException("httpConfig cannot be null");
-        if (isNull(retryPolicy)) throw new DomainValidationException("retryPolicy cannot be null");
-        if (isNull(audit)) throw new DomainValidationException("audit cannot be null");
-
-        this.id = id;
-        this.taskInfo = taskInfo;
-        this.taskStatus = status;
-        this.metadata = metadata;
-        this.httpConfig = httpConfig;
-        this.retryPolicy = retryPolicy;
-        this.audit = audit;
+        this.setId(id);
+        this.setTaskInfo(taskInfo);
+        this.setTaskStatus(status);
+        this.setMetadata(metadata);
+        this.setHttpConfig(httpConfig);
+        this.setRetryPolicy(retryPolicy);
+        this.setAudit(audit);
     }
 
     /**
@@ -74,7 +65,7 @@ public class TaskDefinition {
                 .id(TaskDefinitionId.random())
                 .taskInfo(taskInfo)
                 .taskStatus(taskStatus)
-                .metadata(metadata != null ? metadata : new HashMap<>())
+                .metadata(metadata)
                 .httpConfig(httpConfig)
                 .retryPolicy(retryPolicy)
                 .audit(Audit.createNew())
@@ -85,50 +76,16 @@ public class TaskDefinition {
      * Deactivates this task definition.
      */
     public void deactivate() {
-        this.taskStatus = TaskStatus.INACTIVE;
-        this.audit = this.audit.withUpdatedAt(Instant.now());
+        this.setTaskStatus(TaskStatus.INACTIVE);
+        this.markAsModified();
     }
 
     /**
      * Activates this task definition.
      */
     public void activate() {
-        this.taskStatus = TaskStatus.ACTIVE;
-        this.audit = this.audit.withUpdatedAt(Instant.now());
-    }
-
-    /**
-     * Updates the HTTP configuration.
-     *
-     * @param newHttpConfig the new HTTP configuration
-     */
-    public void updateHttpConfig(HttpConfig newHttpConfig) {
-        if (isNull(newHttpConfig)) throw new DomainValidationException("httpConfig cannot be null");
-
-        this.httpConfig = newHttpConfig;
-        this.audit = this.audit.withUpdatedAt(Instant.now());
-    }
-
-    /**
-     * Updates the retry policy.
-     *
-     * @param newRetryPolicy the new retry policy
-     */
-    public void updateRetryPolicy(RetryPolicy newRetryPolicy) {
-        if (isNull(newRetryPolicy)) throw new DomainValidationException("retryPolicy cannot be null");
-
-        this.retryPolicy = newRetryPolicy;
-        this.audit = this.audit.withUpdatedAt(Instant.now());
-    }
-
-    /**
-     * Updates task metadata.
-     *
-     * @param newMetadata the new metadata map
-     */
-    public void updateMetadata(Map<String, String> newMetadata) {
-        this.metadata = newMetadata != null ? new HashMap<>(newMetadata) : new HashMap<>();
-        this.audit = this.audit.withUpdatedAt(Instant.now());
+        this.setTaskStatus(TaskStatus.ACTIVE);
+        this.markAsModified();
     }
 
     /**
@@ -141,7 +98,7 @@ public class TaskDefinition {
         if (isNull(key)) throw new DomainValidationException("Metadata key cannot be null");
 
         this.metadata.put(key, value);
-        this.audit = this.audit.withUpdatedAt(Instant.now());
+        this.markAsModified();
     }
 
     /**
@@ -151,7 +108,7 @@ public class TaskDefinition {
      */
     public void removeMetadata(String key) {
         this.metadata.remove(key);
-        this.audit = this.audit.withUpdatedAt(Instant.now());
+        this.markAsModified();
     }
 
     /**
@@ -159,6 +116,115 @@ public class TaskDefinition {
      */
     public boolean isActive() {
         return TaskStatus.ACTIVE.equals(this.taskStatus);
+    }
+
+    /**
+     * Marks this task definition as modified by updating the audit information.
+     */
+    private void markAsModified() {
+        this.setAudit(this.audit.withUpdatedAt(Instant.now()));
+    }
+
+    /**
+     * Updates the HTTP configuration.
+     *
+     * @param newHttpConfig the new HTTP configuration
+     */
+    public void changeHttpConfig(HttpConfig newHttpConfig) {
+        this.setHttpConfig(newHttpConfig);
+        this.markAsModified();
+    }
+
+    /**
+     * Updates the retry policy.
+     *
+     * @param newRetryPolicy the new retry policy
+     */
+    public void changeRetryPolicy(RetryPolicy newRetryPolicy) {
+        this.setRetryPolicy(newRetryPolicy);
+        this.markAsModified();
+    }
+
+    /**
+     * Updates task metadata.
+     *
+     * @param newMetadata the new metadata map
+     */
+    public void changeMetadata(Map<String, String> newMetadata) {
+        this.setMetadata(newMetadata);
+        this.markAsModified();
+    }
+
+    public TaskDefinitionId id() {
+        return id;
+    }
+
+    public TaskInfo taskInfo() {
+        return taskInfo;
+    }
+
+    public TaskStatus taskStatus() {
+        return taskStatus;
+    }
+
+    public Map<String, String> metadata() {
+        return metadata;
+    }
+
+    public HttpConfig httpConfig() {
+        return httpConfig;
+    }
+
+    public RetryPolicy retryPolicy() {
+        return retryPolicy;
+    }
+
+    public Audit audit() {
+        return audit;
+    }
+
+    private void setId(TaskDefinitionId id) {
+        if (isNull(id)) throw new DomainValidationException("id cannot be null");
+
+        this.id = id;
+    }
+
+    private void setTaskInfo(TaskInfo taskInfo) {
+        if (isNull(taskInfo)) throw new DomainValidationException("taskInfo cannot be null");
+
+        this.taskInfo = taskInfo;
+    }
+
+    private void setTaskStatus(TaskStatus taskStatus) {
+        if (isNull(taskStatus)) throw new DomainValidationException("taskStatus cannot be null");
+
+        this.taskStatus = taskStatus;
+    }
+
+    private void setMetadata(Map<String, String> metadata) {
+        if (isNull(metadata)) {
+            this.metadata = new HashMap<>();
+            return;
+        }
+        this.metadata = metadata;
+    }
+
+    private void setHttpConfig(HttpConfig httpConfig) {
+        if (isNull(httpConfig)) throw new DomainValidationException("httpConfig cannot be null");
+
+        this.httpConfig = httpConfig;
+    }
+
+    private void setRetryPolicy(RetryPolicy retryPolicy) {
+        if (isNull(retryPolicy)) throw new DomainValidationException("retryPolicy cannot be null");
+
+        this.retryPolicy = retryPolicy;
+    }
+
+    private void setAudit(Audit audit) {
+        if (isNull(audit)) throw new DomainValidationException("audit cannot be null");
+
+        this.audit = audit;
     }
 }
 

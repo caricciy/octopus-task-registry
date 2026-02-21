@@ -46,7 +46,7 @@ public class CreateTaskDefinitionUseCaseImpl implements CreateTaskDefinitionUseC
         // Save the new task definition
         var saved = saveTaskDefinitionPort.save(taskDefinition);
 
-        log.info("Successfully created TaskDefinition with name '{}' and id '{}'", saved.getTaskInfo().name(), saved.getId().value());
+        log.info("Successfully created TaskDefinition with name '{}' and id '{}'", saved.taskInfo().name(), saved.id().value());
 
         return saved;
     }
